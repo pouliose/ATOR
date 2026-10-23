@@ -32,7 +32,8 @@ ArgumentException.ThrowIfNullOrWhiteSpace(sourceId);
 ArgumentException.ThrowIfNullOrWhiteSpace(receiverHost);
 
 builder.Services.AddSingleton(new TelemetryProducerOptions(port, intervalSeconds, trackCount, sourceId, receiverHost));
-builder.Services.AddSingleton<ATOR.Simulation.TelemetrySimulator>();
+builder.Services.AddSingleton<ATOR.Simulation.TelemetrySimulator>(
+    _ => new ATOR.Simulation.TelemetrySimulator(Random.Shared));
 builder.Services.AddHostedService<UdpTelemetryProducerService>();
 
 await builder.Build().RunAsync();

@@ -36,6 +36,7 @@ Compose passes settings to .NET using the double-underscore environment variable
 | `TELEMETRY_TRACK_COUNT` | `3` | Simulated tracks in each producer batch. |
 | `TELEMETRY_SOURCE_ID` | `SIM-01` | Identifier attached to producer reports. |
 | `CONSUMER_HTTP_HOST_PORT` | `5100` | Host port for the Consumer HTTP API. Bound to `127.0.0.1` only. |
+| `DASHBOARD_HTTP_HOST_PORT` | `5173` | Host port for the Dashboard frontend. Bound to `127.0.0.1` only. |
 | `POSTGRES_HOST_PORT` | `5433` | Host port for local PostgreSQL clients and EF CLI tools. Bound to `127.0.0.1` only. |
 | `POSTGRES_PASSWORD` | `ator_dev_password` | Local PostgreSQL password used by the database and consumer. Change this for local environments where the default is unsuitable. |
 
@@ -55,7 +56,7 @@ TELEMETRY_UDP_PORT=5100 TELEMETRY_SOURCE_ID=SIM-02 docker compose up --build
 
 ## Networking
 
-Compose places its services on the default private bridge network. The consumer connects to PostgreSQL using the Compose DNS name `postgres` and port `5432`; host-side tools such as `dotnet ef` can use `localhost:5433`. PostgreSQL's host port and the Consumer HTTP API host port (`localhost:5100` by default) are bound to `127.0.0.1` only. The Consumer API is available at `http://localhost:5100/api/v1/tracks/current`, and its OpenAPI document is at `http://localhost:5100/openapi/v1.json`. The consumer listens on `0.0.0.0` inside its container, and the producer sends to the Compose DNS service name `consumer`. The UDP port is exposed to other Compose services but is not published to the host. This keeps the sample receiver local to the Compose network and avoids connecting to external telemetry sources.
+Compose places its services on the default private bridge network. The dashboard is served at `http://localhost:5173` by default and proxies `/api/` and `/openapi/` requests to the consumer over the Compose network. The Consumer API is also available directly at `http://localhost:5100/api/v1/tracks/current`, and its OpenAPI document at `http://localhost:5100/openapi/v1.json`; both host ports are bound to `127.0.0.1` only. The consumer connects to PostgreSQL using the Compose DNS name `postgres` and port `5432`; host-side tools such as `dotnet ef` can use `localhost:5433`. PostgreSQL's host port is also bound to `127.0.0.1`. The consumer listens on `0.0.0.0` inside its container, and the producer sends to the Compose DNS service name `consumer`. The UDP port is exposed to other Compose services but is not published to the host. This keeps the sample receiver local to the Compose network and avoids connecting to external telemetry sources.
 
 The receiver's configured bind address defaults to `127.0.0.1` when running outside Docker; Compose overrides it because container loopback is private to each container. Likewise, the producer's receiver host defaults to `127.0.0.1` for local non-container runs and Compose sets it to `consumer`.
 
@@ -67,6 +68,7 @@ The foreground `docker compose up` command streams both services' logs. To inspe
 docker compose logs
 docker compose logs -f consumer
 docker compose logs -f producer
+docker compose logs -f dashboard
 ```
 
 ## Windows and Linux

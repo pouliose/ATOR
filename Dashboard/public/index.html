@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101923">
+    <meta name="description" content="Live overview of the latest reported track positions.">
+    <title>ATOR | Track dashboard</title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <script type="module" src="/assets/js/app.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="ATOR dashboard home">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span>ATOR <span class="brand-divider">/</span> Operations</span>
+      </a>
+      <span class="environment-label">LIVE TELEMETRY</span>
+    </header>
+
+    <main class="dashboard">
+      <section class="page-heading" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">SITUATIONAL OVERVIEW</p>
+          <h1 id="page-title">Track positions</h1>
+          <p class="page-description">Latest position received for each reporting track.</p>
+        </div>
+        <button class="refresh-button" id="refresh-button" type="button">
+          <span aria-hidden="true">&#8635;</span>
+          Refresh
+        </button>
+      </section>
+
+      <section class="summary-grid" aria-label="Track summary">
+        <article class="summary-card">
+          <p class="summary-label">Tracked objects</p>
+          <p class="summary-value" id="track-count">--</p>
+          <p class="summary-note">Current latest positions</p>
+        </article>
+        <article class="summary-card summary-card-wide">
+          <p class="summary-label">Data status</p>
+          <p class="status-line">
+            <span class="status-indicator" id="status-indicator" aria-hidden="true"></span>
+            <span class="summary-value summary-status" id="status-text" role="status" aria-live="polite">
+              Connecting to telemetry service
+            </span>
+          </p>
+          <p class="summary-note" id="updated-at">Waiting for first update</p>
+        </article>
+      </section>
+
+      <section class="tracks-panel" aria-labelledby="tracks-title">
+        <div class="panel-heading">
+          <div>
+            <h2 id="tracks-title">Current positions</h2>
+            <p>Position and motion details for all known tracks.</p>
+          </div>
+          <span class="refresh-interval">Auto-refresh · 5 sec</span>
+        </div>
+
+        <div class="error-message" id="error-message" role="alert" hidden></div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Track</th>
+                <th scope="col">Source</th>
+                <th scope="col">Latitude</th>
+                <th scope="col">Longitude</th>
+                <th scope="col">Altitude</th>
+                <th scope="col">Ground speed</th>
+                <th scope="col">Reported</th>
+              </tr>
+            </thead>
+            <tbody id="tracks-body">
+              <tr>
+                <td class="table-placeholder" colspan="7">Loading current positions…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <footer class="page-footer">ATOR telemetry dashboard</footer>
+    </main>
+  </body>
+</html>

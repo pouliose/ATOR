@@ -5,12 +5,11 @@ namespace ATOR.Producer.Tests;
 
 public sealed class TelemetrySimulatorTests
 {
-    private readonly TelemetrySimulator _simulator = new();
-
     [Fact]
     public void GenerateReports_ReturnsRequestedNumberOfReports()
     {
-        var reports = _simulator.GenerateReports(3, "source-1");
+        var simulator = CreateSimulator();
+        var reports = simulator.GenerateReports(3, "source-1");
 
         Assert.Equal(3, reports.Count);
         Assert.All(reports, report => Assert.Equal("source-1", report.SourceId));
@@ -19,7 +18,8 @@ public sealed class TelemetrySimulatorTests
     [Fact]
     public void GenerateReports_UsesSequentialIdsAndPredictableTrackValues()
     {
-        var reports = _simulator.GenerateReports(3, "source-1");
+        var simulator = CreateSimulator();
+        var reports = simulator.GenerateReports(3, "source-1");
 
         var expected = new[]
         {
@@ -41,8 +41,9 @@ public sealed class TelemetrySimulatorTests
     [Fact]
     public void GenerateReports_UsesDescendingUtcTimestamps()
     {
+        var simulator = CreateSimulator();
         var beforeGeneration = DateTimeOffset.UtcNow;
-        var reports = _simulator.GenerateReports(3, "source-1");
+        var reports = simulator.GenerateReports(3, "source-1");
         var afterGeneration = DateTimeOffset.UtcNow;
 
         Assert.All(reports, report =>
@@ -59,8 +60,9 @@ public sealed class TelemetrySimulatorTests
     [InlineData(-1)]
     public void GenerateReports_RejectsNonPositiveCount(int count)
     {
+        var simulator = CreateSimulator();
         Assert.Throws<ArgumentOutOfRangeException>(
-            () => _simulator.GenerateReports(count, "source-1"));
+            () => simulator.GenerateReports(count, "source-1"));
     }
 
     [Theory]
@@ -68,7 +70,52 @@ public sealed class TelemetrySimulatorTests
     [InlineData(" ")]
     public void GenerateReports_RejectsBlankSourceId(string sourceId)
     {
+        var simulator = CreateSimulator();
         Assert.Throws<ArgumentException>(
-            () => _simulator.GenerateReports(1, sourceId));
+            () => simulator.GenerateReports(1, sourceId));
+    }
+
+    [Fact]
+    public void GenerateReports_AddsOnlySmallCoordinateVariations()
+    {
+        var simulator = new TelemetrySimulator(new Random(12345));
+
+        var reports = simulator.GenerateReports(10, "source-1");
+
+        for (var index = 0; index < reports.Count; index++)
+        {
+            var report = reports[index];
+            var baseLatitude = 37.9838 + (index * 0.01);
+            var baseLongitude = 23.7275 + (index * 0.015);
+
+            Assert.InRange(Math.Abs(report.LatitudeDegrees - baseLatitude), 0, 0.0001000001);
+            Assert.InRange(Math.Abs(report.LongitudeDegrees - baseLongitude), 0, 0.0001000001);
+        }
+
+        Assert.Contains(reports.Zip(Enumerable.Range(0, reports.Count)), pair =>
+            pair.First.LatitudeDegrees != 37.9838 + (pair.Second * 0.01) ||
+            pair.First.LongitudeDegrees != 23.7275 + (pair.Second * 0.015));
+    }
+
+    [Fact]
+    public void GenerateReports_ProducesReproducibleCoordinatesWithSameRandomSeed()
+    {
+        var firstSimulator = new TelemetrySimulator(new Random(42));
+        var secondSimulator = new TelemetrySimulator(new Random(42));
+
+        var firstReports = firstSimulator.GenerateReports(3, "source-1");
+        var secondReports = secondSimulator.GenerateReports(3, "source-1");
+
+        Assert.Equal(
+            firstReports.Select(report => (report.LatitudeDegrees, report.LongitudeDegrees)),
+            secondReports.Select(report => (report.LatitudeDegrees, report.LongitudeDegrees)));
+    }
+
+    private static TelemetrySimulator CreateSimulator() =>
+        new(new FixedRandom(0.5));
+
+    private sealed class FixedRandom(double value) : Random
+    {
+        public override double NextDouble() => value;
     }
 }
