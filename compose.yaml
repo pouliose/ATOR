@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ator
+      POSTGRES_USER: ator
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-ator_dev_password}"
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5433}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ator -d ator"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.Consumer
+    environment:
+      Telemetry__UdpPort: "${TELEMETRY_UDP_PORT:-5000}"
+      Telemetry__ListenAddress: "0.0.0.0"
+      ConnectionStrings__Telemetry: "Host=postgres;Port=5432;Database=ator;Username=ator;Password=${POSTGRES_PASSWORD:-ator_dev_password}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - "${TELEMETRY_UDP_PORT:-5000}/udp"
+    restart: unless-stopped
+
+  producer:
+    build:
+      context: .
+      dockerfile: Dockerfile.Producer
+    depends_on:
+      - consumer
+    environment:
+      Telemetry__UdpPort: "${TELEMETRY_UDP_PORT:-5000}"
+      Telemetry__ReceiverHost: "consumer"
+      Telemetry__IntervalSeconds: "${TELEMETRY_INTERVAL_SECONDS:-1}"
+      Telemetry__TrackCount: "${TELEMETRY_TRACK_COUNT:-3}"
+      Telemetry__SourceId: "${TELEMETRY_SOURCE_ID:-SIM-01}"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

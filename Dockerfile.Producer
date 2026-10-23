@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+COPY ["Producer/ATOR.Producer.csproj", "Producer/"]
+COPY ["Contracts/ATOR.Contracts.csproj", "Contracts/"]
+RUN dotnet restore "Producer/ATOR.Producer.csproj"
+
+COPY . .
+WORKDIR /src/Producer
+RUN dotnet publish "ATOR.Producer.csproj" --configuration Release --output /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "ATOR.Producer.dll"]

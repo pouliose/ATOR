@@ -1,19 +1,36 @@
+using System.Net;
+using System.Net.Sockets;
 using ATOR.Receiver;
 using ATOR.Reports;
+using Microsoft.EntityFrameworkCore;
 
 var builder = Host.CreateApplicationBuilder(args);
 
 var udpPort = builder.Configuration.GetValue<int?>("Telemetry:UdpPort") ?? 5000;
+var listenAddressText = builder.Configuration["Telemetry:ListenAddress"] ?? "127.0.0.1";
+var connectionString = builder.Configuration.GetConnectionString("Telemetry")
+    ?? throw new InvalidOperationException(
+        "Configure the PostgreSQL connection string in ConnectionStrings:Telemetry.");
 if (udpPort is < 1 or > 65535)
 {
     throw new InvalidOperationException("Telemetry:UdpPort must be between 1 and 65535.");
 }
 
-builder.Services.AddSingleton<TrackReportStore>();
+if (!IPAddress.TryParse(listenAddressText, out var listenAddress) ||
+    listenAddress.AddressFamily != AddressFamily.InterNetwork)
+{
+    throw new InvalidOperationException("Telemetry:ListenAddress must be a valid IPv4 address.");
+}
+
+builder.Services.AddDbContextFactory<TelemetryDbContext>(options =>
+    options.UseNpgsql(connectionString));
+builder.Services.AddSingleton<PostgresTrackReportRepository>();
+builder.Services.AddHostedService<PostgresDatabaseInitializer>();
 builder.Services.AddHostedService(serviceProvider =>
     new UdpTelemetryReceiverService(
+        listenAddress,
         udpPort,
-        serviceProvider.GetRequiredService<TrackReportStore>(),
+        serviceProvider.GetRequiredService<PostgresTrackReportRepository>(),
         serviceProvider.GetRequiredService<ILogger<UdpTelemetryReceiverService>>()));
 
 await builder.Build().RunAsync();

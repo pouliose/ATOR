@@ -14,11 +14,11 @@ The application must not connect to real aircraft, operational networks, or live
 - The receiver binds to `127.0.0.1` only and uses port `5000` by default; override it with the `Telemetry:UdpPort` configuration setting.
 - JSON and XML adapters validate and normalize reports into one domain model.
 - The service maintains the latest report for each `(sourceId, trackId)` pair and detects duplicate or stale reports.
-- SQLite stores track and alert history.
+- PostgreSQL stores current tracks and accepted telemetry history.
 - An ASP.NET Core REST API exposes tracks, alerts, and health.
 - A browser dashboard displays simulated tracks and alerts.
 
-The initial dashboard mapping library and container setup are implementation choices to settle when those milestones begin. PostgreSQL, Redis, gRPC, and a separate frontend framework are optional extensions, not MVP requirements.
+The initial dashboard mapping library remains an implementation choice. Redis, gRPC, and a separate frontend framework are optional extensions, not MVP requirements.
 
 ## Telemetry contract
 
@@ -88,19 +88,27 @@ The logical JSON property names are camelCase. XML uses a `TrackReport` root ele
 
 ## Running the two applications
 
+Set the PostgreSQL connection string before starting the consumer. For example, with a PostgreSQL instance running locally:
+
+```powershell
+$env:ConnectionStrings__Telemetry = "Host=localhost;Port=5432;Database=ator;Username=your_user;Password=your_password"
+```
+
 Start the consumer first:
 
 ```powershell
-dotnet run --project Consumer/ATOR.Consumer.csproj
+dotnet run --project .\Consumer\ATOR.Consumer.csproj
 ```
 
 In a second console, start the producer:
 
 ```powershell
-dotnet run --project Producer/ATOR.Producer.csproj
+dotnet run --project .\Producer\ATOR.Producer.csproj
 ```
 
 Both apps are separate deployable projects and use UDP port `5000` by default. Configure the port with `Telemetry__UdpPort`. The producer also supports `Telemetry__IntervalSeconds`, `Telemetry__TrackCount`, and `Telemetry__SourceId`; use different source IDs when running multiple local producers.
+
+For separate Docker containers and Docker Compose instructions, see [DOCKER.md](./DOCKER.md).
 
 ## Out of scope
 

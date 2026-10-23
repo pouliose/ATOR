@@ -11,7 +11,8 @@ public sealed record TelemetryProducerOptions(
     int Port,
     int IntervalSeconds,
     int TrackCount,
-    string SourceId);
+    string SourceId,
+    string ReceiverHost);
 
 public sealed class UdpTelemetryProducerService(
     TelemetryProducerOptions options,
@@ -26,13 +27,18 @@ public sealed class UdpTelemetryProducerService(
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var sender = new UdpClient(AddressFamily.InterNetwork);
-        var receiver = new IPEndPoint(IPAddress.Loopback, options.Port);
+        var receiverAddress = (await Dns.GetHostAddressesAsync(options.ReceiverHost))
+            .FirstOrDefault(address => address.AddressFamily == AddressFamily.InterNetwork)
+            ?? throw new InvalidOperationException(
+                $"Receiver host '{options.ReceiverHost}' did not resolve to an IPv4 address.");
+        var receiver = new IPEndPoint(receiverAddress, options.Port);
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(options.IntervalSeconds));
 
         logger.LogInformation(
-            "Telemetry producer {SourceId} sending {TrackCount} tracks to 127.0.0.1:{Port} every {IntervalSeconds} seconds.",
+            "Telemetry producer {SourceId} sending {TrackCount} tracks to {ReceiverHost}:{Port} every {IntervalSeconds} seconds.",
             options.SourceId,
             options.TrackCount,
+            options.ReceiverHost,
             options.Port,
             options.IntervalSeconds);
 

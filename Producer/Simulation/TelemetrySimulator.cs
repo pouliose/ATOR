@@ -5,8 +5,8 @@ namespace ATOR.Simulation;
 public sealed class TelemetrySimulator
 {
     public IReadOnlyList<TrackReport> GenerateReports(
-        int count = 3,
-        string sourceId = "SIM-01")
+        int count,
+        string sourceId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
         ArgumentException.ThrowIfNullOrWhiteSpace(sourceId);

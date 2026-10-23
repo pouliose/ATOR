@@ -9,8 +9,9 @@ using ATOR.Reports;
 namespace ATOR.Receiver;
 
 public sealed class UdpTelemetryReceiverService(
+    IPAddress listenAddress,
     int port,
-    TrackReportStore reportStore,
+    PostgresTrackReportRepository reportRepository,
     ILogger<UdpTelemetryReceiverService> logger) : BackgroundService
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -21,9 +22,10 @@ public sealed class UdpTelemetryReceiverService(
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        using var receiver = new UdpClient(new IPEndPoint(IPAddress.Loopback, port));
+        using var receiver = new UdpClient(new IPEndPoint(listenAddress, port));
         logger.LogInformation(
-            "Telemetry consumer listening on 127.0.0.1:{Port}. Press Ctrl+C to stop.",
+            "Telemetry consumer listening on {ListenAddress}:{Port}. Press Ctrl+C to stop.",
+            listenAddress,
             port);
 
         while (!stoppingToken.IsCancellationRequested)
@@ -54,7 +56,7 @@ public sealed class UdpTelemetryReceiverService(
                     continue;
                 }
 
-                var updateResult = reportStore.AddOrUpdate(report!);
+                var updateResult = await reportRepository.AddIfNewerAsync(report!, stoppingToken);
                 if (updateResult != TrackReportUpdateResult.Accepted)
                 {
                     logger.LogInformation(
@@ -65,7 +67,9 @@ public sealed class UdpTelemetryReceiverService(
                     continue;
                 }
 
-                var reportJson = JsonSerializer.Serialize(reportStore.CreateReport(), JsonOptions);
+                var reportJson = JsonSerializer.Serialize(
+                    await reportRepository.CreateReportAsync(stoppingToken),
+                    JsonOptions);
                 logger.LogInformation("Current tracks report:\n{ReportJson}", reportJson);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
