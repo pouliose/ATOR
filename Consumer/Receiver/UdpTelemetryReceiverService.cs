@@ -1,8 +1,6 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using ATOR.Models;
 using ATOR.Reports;
 
