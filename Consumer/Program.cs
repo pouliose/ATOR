@@ -1,10 +1,12 @@
 using System.Net;
 using System.Net.Sockets;
+using ATOR.Api;
 using ATOR.Receiver;
 using ATOR.Reports;
+using ATOR.Services;
 using Microsoft.EntityFrameworkCore;
 
-var builder = Host.CreateApplicationBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
 var udpPort = builder.Configuration.GetValue<int?>("Telemetry:UdpPort") ?? 5000;
 var listenAddressText = builder.Configuration["Telemetry:ListenAddress"] ?? "127.0.0.1";
@@ -25,6 +27,9 @@ if (!IPAddress.TryParse(listenAddressText, out var listenAddress) ||
 builder.Services.AddDbContextFactory<TelemetryDbContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddSingleton<PostgresTrackReportRepository>();
+builder.Services.AddSingleton<ICurrentTracksReader>(serviceProvider =>
+    serviceProvider.GetRequiredService<PostgresTrackReportRepository>());
+builder.Services.AddScoped<ICurrentTracksService, CurrentTracksService>();
 builder.Services.AddHostedService<PostgresDatabaseInitializer>();
 builder.Services.AddHostedService(serviceProvider =>
     new UdpTelemetryReceiverService(
@@ -33,4 +38,12 @@ builder.Services.AddHostedService(serviceProvider =>
         serviceProvider.GetRequiredService<PostgresTrackReportRepository>(),
         serviceProvider.GetRequiredService<ILogger<UdpTelemetryReceiverService>>()));
 
-await builder.Build().RunAsync();
+builder.Services.AddOpenApi();
+builder.Services.AddProblemDetails();
+
+var app = builder.Build();
+app.UseExceptionHandler();
+app.UseStatusCodePages();
+app.MapOpenApi();
+app.MapCurrentTracksEndpoints();
+await app.RunAsync();

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace ATOR.Reports;
 
 public sealed class PostgresTrackReportRepository(
-    IDbContextFactory<TelemetryDbContext> dbContextFactory)
+    IDbContextFactory<TelemetryDbContext> dbContextFactory) : ICurrentTracksReader
 {
     public async Task<IReadOnlyList<string>> InitializeAsync(CancellationToken cancellationToken)
     {

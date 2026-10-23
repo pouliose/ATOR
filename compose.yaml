@@ -27,6 +27,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    ports:
+      - "127.0.0.1:${CONSUMER_HTTP_HOST_PORT:-5100}:8080"
     expose:
       - "${TELEMETRY_UDP_PORT:-5000}/udp"
     restart: unless-stopped

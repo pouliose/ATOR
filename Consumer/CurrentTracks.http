@@ -1,0 +1,9 @@
+@baseUrl = http://localhost:5100
+
+### Get the OpenAPI document
+GET {{baseUrl}}/openapi/v1.json
+Accept: application/json
+
+### Get the latest known position for every track
+GET {{baseUrl}}/api/v1/tracks/current
+Accept: application/json
