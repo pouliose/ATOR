@@ -29,7 +29,7 @@ builder.Services.AddDbContextFactory<TelemetryDbContext>(options =>
 builder.Services.AddSingleton<PostgresTrackReportRepository>();
 builder.Services.AddSingleton<ICurrentTracksReader>(serviceProvider =>
     serviceProvider.GetRequiredService<PostgresTrackReportRepository>());
-builder.Services.AddScoped<ICurrentTracksService, CurrentTracksService>();
+builder.Services.AddScoped<ITracksService, TracksService>();
 builder.Services.AddHostedService<PostgresDatabaseInitializer>();
 builder.Services.AddHostedService(serviceProvider =>
     new UdpTelemetryReceiverService(

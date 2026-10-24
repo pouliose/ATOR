@@ -81,7 +81,7 @@ The logical JSON property names are camelCase. XML uses a `TrackReport` root ele
 3. Repeated reports and out-of-order timestamps do not duplicate history or roll back a current track.
 4. The hosted application remains active while listening for local UDP reports, shuts down cleanly, and continues after a rejected datagram.
 5. Configured zone-entry and transmission-timeout conditions produce queryable alerts.
-6. The REST API exposes current tracks, alert history, and service health; automated tests cover success and failure cases.
+6. The REST API exposes current tracks, paginated track history, alert history, and service health; automated tests cover success and failure cases.
 7. The dashboard shows current simulated positions and alerts and updates as new reports arrive.
 8. The project can be built and its automated tests run on Windows and Linux using documented steps.
 9. Performance testing records throughput, processing latency, and memory use for a repeatable simulated load; results include the test environment and load profile.

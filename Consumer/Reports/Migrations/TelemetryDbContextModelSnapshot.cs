@@ -89,6 +89,9 @@ namespace ATOR.Consumer.Reports.Migrations
 
                     b.HasKey("SourceId", "TrackId", "TimestampUtc");
 
+                    b.HasIndex("TrackId", "TimestampUtc", "SourceId")
+                        .HasDatabaseName("IX_telemetry_reports_track_id_timestamp_utc_source_id");
+
                     b.ToTable("telemetry_reports", (string)null);
                 });
 #pragma warning restore 612, 618

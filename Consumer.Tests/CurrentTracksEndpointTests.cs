@@ -49,6 +49,63 @@ public sealed class CurrentTracksEndpointTests
     }
 
     [Fact]
+    public async Task GetHistory_ReturnsHistoryForTrackIdAtVersionedRoute()
+    {
+        var timestamp = new DateTimeOffset(2026, 10, 23, 12, 0, 0, TimeSpan.Zero);
+        var expectedResponse = new TrackHistoryResponse(
+            "track-1",
+            2,
+            false,
+            null,
+            [
+                new TrackPositionResponse("source-1", "track-1", timestamp, 10, 20, 300, 40),
+                new TrackPositionResponse("source-2", "track-1", timestamp.AddMinutes(1), 11, 21, 310, 41)
+            ]);
+
+        await using var app = await CreateAppAsync(
+            new CurrentTracksResponse(timestamp, 0, []),
+            expectedResponse);
+        using var client = app.GetTestClient();
+
+        using var response = await client.GetAsync(
+            "/api/v1/tracks/track-1/history?limit=2" +
+            "&beforeTimestampUtc=2026-10-23T12%3A00%3A00Z&beforeSourceId=source-0");
+        var actualResponse = await response.Content.ReadFromJsonAsync<TrackHistoryResponse>();
+        var service = Assert.IsType<StubTracksService>(
+            app.Services.GetRequiredService<ITracksService>());
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(actualResponse);
+        Assert.Equal(expectedResponse.TrackId, actualResponse.TrackId);
+        Assert.Equal(expectedResponse.ReportCount, actualResponse.ReportCount);
+        Assert.Equal(expectedResponse.HasMore, actualResponse.HasMore);
+        Assert.Equal(expectedResponse.NextCursor, actualResponse.NextCursor);
+        Assert.Equal(expectedResponse.Reports, actualResponse.Reports);
+        Assert.Equal(2, service.PageSize);
+        Assert.Equal(timestamp, service.BeforeTimestampUtc);
+        Assert.Equal("source-0", service.BeforeSourceId);
+    }
+
+    [Theory]
+    [InlineData("?limit=0")]
+    [InlineData("?limit=501")]
+    [InlineData("?beforeTimestampUtc=2026-10-23T12%3A00%3A00Z")]
+    [InlineData("?beforeSourceId=source-1")]
+    public async Task GetHistory_ReturnsBadRequestForInvalidPagination(string query)
+    {
+        await using var app = await CreateAppAsync(
+            new CurrentTracksResponse(DateTimeOffset.UtcNow, 0, []));
+        using var client = app.GetTestClient();
+
+        using var response = await client.GetAsync($"/api/v1/tracks/track-1/history{query}");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(
+            "application/problem+json",
+            response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
     public async Task OpenApiDocument_IsServedAndDescribesVersionedCurrentTracksEndpoint()
     {
         await using var app = await CreateAppAsync(
@@ -64,6 +121,10 @@ public sealed class CurrentTracksEndpointTests
             .GetProperty("paths")
             .GetProperty("/api/v1/tracks/current")
             .GetProperty("get");
+        var historyOperation = root
+            .GetProperty("paths")
+            .GetProperty("/api/v1/tracks/{trackId}/history")
+            .GetProperty("get");
 
         Assert.Equal(HttpStatusCode.OK, documentResponse.StatusCode);
         Assert.Equal("application/json", documentResponse.Content.Headers.ContentType?.MediaType);
@@ -72,10 +133,13 @@ public sealed class CurrentTracksEndpointTests
             "Get the latest known position of every track",
             operation.GetProperty("summary").GetString());
         Assert.True(operation.GetProperty("responses").TryGetProperty("200", out _));
+        Assert.Equal("Get telemetry history for a track ID", historyOperation.GetProperty("summary").GetString());
+        Assert.True(historyOperation.GetProperty("responses").TryGetProperty("200", out _));
     }
 
     private static async Task<WebApplication> CreateAppAsync(
         CurrentTracksResponse response,
+        TrackHistoryResponse? historyResponse = null,
         bool includeOpenApi = false)
     {
         var builder = WebApplication.CreateBuilder();
@@ -85,7 +149,8 @@ public sealed class CurrentTracksEndpointTests
             builder.Services.AddOpenApi();
         }
 
-        builder.Services.AddSingleton<ICurrentTracksService>(new FakeCurrentTracksService(response));
+        builder.Services.AddSingleton<ITracksService>(
+            new StubTracksService(response, historyResponse));
 
         var app = builder.Build();
         if (includeOpenApi)
@@ -98,9 +163,30 @@ public sealed class CurrentTracksEndpointTests
         return app;
     }
 
-    private sealed class FakeCurrentTracksService(CurrentTracksResponse response) : ICurrentTracksService
+    private sealed class StubTracksService(
+        CurrentTracksResponse response,
+        TrackHistoryResponse? historyResponse) : ITracksService
     {
+        public int PageSize { get; private set; }
+
+        public DateTimeOffset? BeforeTimestampUtc { get; private set; }
+
+        public string? BeforeSourceId { get; private set; }
+
         public Task<CurrentTracksResponse> GetCurrentAsync(CancellationToken cancellationToken) =>
             Task.FromResult(response);
+
+        public Task<TrackHistoryResponse> GetHistoryAsync(
+            string trackId,
+            int pageSize,
+            DateTimeOffset? beforeTimestampUtc,
+            string? beforeSourceId,
+            CancellationToken cancellationToken)
+        {
+            PageSize = pageSize;
+            BeforeTimestampUtc = beforeTimestampUtc;
+            BeforeSourceId = beforeSourceId;
+            return Task.FromResult(historyResponse ?? new TrackHistoryResponse(trackId, 0, false, null, []));
+        }
     }
 }

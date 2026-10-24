@@ -86,6 +86,49 @@ public sealed class PostgresTrackReportRepository(
         return new CurrentTracksReport(DateTimeOffset.UtcNow, reports.Count, reports);
     }
 
+    public async Task<TrackHistoryPage> GetHistoryAsync(
+        string trackId,
+        int pageSize,
+        DateTimeOffset? beforeTimestampUtc,
+        string? beforeSourceId,
+        CancellationToken cancellationToken)
+    {
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var query = dbContext.TelemetryReports
+            .AsNoTracking()
+            .Where(report => report.TrackId == trackId);
+
+        if (beforeTimestampUtc is not null && beforeSourceId is not null)
+        {
+            var cursorTimestampUtc = beforeTimestampUtc.Value.UtcDateTime;
+            query = query.Where(report =>
+                report.TimestampUtc < cursorTimestampUtc ||
+                (report.TimestampUtc == cursorTimestampUtc &&
+                    string.Compare(report.SourceId, beforeSourceId) < 0));
+        }
+
+        var page = await query
+            .OrderByDescending(report => report.TimestampUtc)
+            .ThenByDescending(report => report.SourceId)
+            .Take(pageSize + 1)
+            .ToListAsync(cancellationToken);
+
+        var hasMore = page.Count > pageSize;
+        var reports = page
+            .Take(pageSize)
+            .Select(report => new TrackReport(
+                report.SourceId,
+                report.TrackId,
+                new DateTimeOffset(DateTime.SpecifyKind(report.TimestampUtc, DateTimeKind.Utc)),
+                report.LatitudeDegrees,
+                report.LongitudeDegrees,
+                report.AltitudeMeters,
+                report.GroundSpeedMetersPerSecond))
+            .ToArray();
+
+        return new TrackHistoryPage(reports, hasMore);
+    }
+
     private static TelemetryReportEntity CreateEntity(TrackReport report) =>
         new()
         {

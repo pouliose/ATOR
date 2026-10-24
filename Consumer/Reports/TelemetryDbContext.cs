@@ -37,6 +37,13 @@ public sealed class TelemetryDbContext(DbContextOptions<TelemetryDbContext> opti
             entity.Property(report => report.AltitudeMeters).HasColumnName("altitude_meters");
             entity.Property(report => report.GroundSpeedMetersPerSecond)
                 .HasColumnName("ground_speed_meters_per_second");
+            entity.HasIndex(report => new
+                {
+                    report.TrackId,
+                    report.TimestampUtc,
+                    report.SourceId
+                })
+                .HasDatabaseName("IX_telemetry_reports_track_id_timestamp_utc_source_id");
         });
     }
 }

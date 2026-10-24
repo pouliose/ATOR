@@ -15,3 +15,16 @@ public sealed record TrackPositionResponse(
     double LongitudeDegrees,
     double AltitudeMeters,
     double GroundSpeedMetersPerSecond);
+
+/// <summary>Represents one page of telemetry history for a track ID.</summary>
+public sealed record TrackHistoryResponse(
+    string TrackId,
+    int ReportCount,
+    bool HasMore,
+    TrackHistoryCursor? NextCursor,
+    IReadOnlyList<TrackPositionResponse> Reports);
+
+/// <summary>Identifies the last report in a history page for fetching the next page.</summary>
+public sealed record TrackHistoryCursor(
+    DateTimeOffset BeforeTimestampUtc,
+    string BeforeSourceId);
