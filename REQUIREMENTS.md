@@ -40,8 +40,8 @@ The logical JSON property names are camelCase. XML uses a `TrackReport` root ele
 
 ```json
 {
-  "sourceId": "SIM-01",
-  "trackId": "SIM-001",
+  "sourceId": "COLLECTOR-01",
+  "trackId": "DRONE-001",
   "timestampUtc": "2026-10-22T15:00:00Z",
   "latitudeDegrees": 37.9838,
   "longitudeDegrees": 23.7275,
@@ -54,8 +54,8 @@ The logical JSON property names are camelCase. XML uses a `TrackReport` root ele
 
 ```xml
 <TrackReport>
-  <SourceId>SIM-01</SourceId>
-  <TrackId>SIM-001</TrackId>
+  <SourceId>COLLECTOR-01</SourceId>
+  <TrackId>DRONE-001</TrackId>
   <TimestampUtc>2026-10-22T15:00:00Z</TimestampUtc>
   <LatitudeDegrees>37.9838</LatitudeDegrees>
   <LongitudeDegrees>23.7275</LongitudeDegrees>

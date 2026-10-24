@@ -9,23 +9,23 @@ public sealed class TelemetrySimulatorTests
     public void GenerateReports_ReturnsRequestedNumberOfReports()
     {
         var simulator = CreateSimulator();
-        var reports = simulator.GenerateReports(3, "source-1");
+        var reports = simulator.GenerateReports(3, "COLLECTOR-01");
 
         Assert.Equal(3, reports.Count);
-        Assert.All(reports, report => Assert.Equal("source-1", report.SourceId));
+        Assert.All(reports, report => Assert.Equal("COLLECTOR-01", report.SourceId));
     }
 
     [Fact]
     public void GenerateReports_UsesSequentialIdsAndPredictableTrackValues()
     {
         var simulator = CreateSimulator();
-        var reports = simulator.GenerateReports(3, "source-1");
+        var reports = simulator.GenerateReports(3, "COLLECTOR-01");
 
         var expected = new[]
         {
-            (TrackId: "SIM-001", Latitude: 37.9838, Longitude: 23.7275, Altitude: 1000d, Speed: 60d),
-            (TrackId: "SIM-002", Latitude: 37.9938, Longitude: 23.7425, Altitude: 1150d, Speed: 62d),
-            (TrackId: "SIM-003", Latitude: 38.0038, Longitude: 23.7575, Altitude: 1300d, Speed: 64d)
+            (TrackId: "DRONE-001", Latitude: 37.9838, Longitude: 23.7275, Altitude: 1000d, Speed: 60d),
+            (TrackId: "DRONE-002", Latitude: 37.9938, Longitude: 23.7425, Altitude: 1150d, Speed: 62d),
+            (TrackId: "DRONE-003", Latitude: 38.0038, Longitude: 23.7575, Altitude: 1300d, Speed: 64d)
         };
 
         var actual = reports.Select(report => (
@@ -43,7 +43,7 @@ public sealed class TelemetrySimulatorTests
     {
         var simulator = CreateSimulator();
         var beforeGeneration = DateTimeOffset.UtcNow;
-        var reports = simulator.GenerateReports(3, "source-1");
+        var reports = simulator.GenerateReports(3, "COLLECTOR-01");
         var afterGeneration = DateTimeOffset.UtcNow;
 
         Assert.All(reports, report =>
@@ -62,7 +62,7 @@ public sealed class TelemetrySimulatorTests
     {
         var simulator = CreateSimulator();
         Assert.Throws<ArgumentOutOfRangeException>(
-            () => simulator.GenerateReports(count, "source-1"));
+            () => simulator.GenerateReports(count, "COLLECTOR-01"));
     }
 
     [Theory]
@@ -80,7 +80,7 @@ public sealed class TelemetrySimulatorTests
     {
         var simulator = new TelemetrySimulator(new Random(12345));
 
-        var reports = simulator.GenerateReports(10, "source-1");
+        var reports = simulator.GenerateReports(10, "COLLECTOR-01");
 
         for (var index = 0; index < reports.Count; index++)
         {
@@ -103,8 +103,8 @@ public sealed class TelemetrySimulatorTests
         var firstSimulator = new TelemetrySimulator(new Random(42));
         var secondSimulator = new TelemetrySimulator(new Random(42));
 
-        var firstReports = firstSimulator.GenerateReports(3, "source-1");
-        var secondReports = secondSimulator.GenerateReports(3, "source-1");
+        var firstReports = firstSimulator.GenerateReports(3, "COLLECTOR-01");
+        var secondReports = secondSimulator.GenerateReports(3, "COLLECTOR-01");
 
         Assert.Equal(
             firstReports.Select(report => (report.LatitudeDegrees, report.LongitudeDegrees)),

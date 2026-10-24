@@ -34,7 +34,7 @@ Compose passes settings to .NET using the double-underscore environment variable
 | `TELEMETRY_UDP_PORT` | `5000` | UDP port used by the consumer and producer. |
 | `TELEMETRY_INTERVAL_SECONDS` | `1` | Number of seconds between producer batches. |
 | `TELEMETRY_TRACK_COUNT` | `3` | Simulated tracks in each producer batch. |
-| `TELEMETRY_SOURCE_ID` | `SIM-01` | Identifier attached to producer reports. |
+| `TELEMETRY_SOURCE_ID` | `COLLECTOR-01` | Identifier attached to producer reports. |
 | `CONSUMER_HTTP_HOST_PORT` | `5100` | Host port for the Consumer HTTP API. Bound to `127.0.0.1` only. |
 | `DASHBOARD_HTTP_HOST_PORT` | `5173` | Host port for the Dashboard frontend. Bound to `127.0.0.1` only. |
 | `POSTGRES_HOST_PORT` | `5433` | Host port for local PostgreSQL clients and EF CLI tools. Bound to `127.0.0.1` only. |
@@ -44,14 +44,14 @@ When running the producer directly, configure its defaults in `Producer/appsetti
 
 ```powershell
 $env:TELEMETRY_UDP_PORT = "5100"
-$env:TELEMETRY_SOURCE_ID = "SIM-02"
+$env:TELEMETRY_SOURCE_ID = "COLLECTOR-02"
 docker compose up --build
 ```
 
 In a Linux shell:
 
 ```sh
-TELEMETRY_UDP_PORT=5100 TELEMETRY_SOURCE_ID=SIM-02 docker compose up --build
+TELEMETRY_UDP_PORT=5100 TELEMETRY_SOURCE_ID=COLLECTOR-02 docker compose up --build
 ```
 
 ## Networking

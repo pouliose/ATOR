@@ -33,7 +33,7 @@ public sealed class TelemetrySimulator
             var baseLongitude = 23.7275 + (index * 0.015);
             reports.Add(new TrackReport(
                 SourceId: sourceId,
-                TrackId: $"SIM-{index + 1:000}",
+                TrackId: $"DRONE-{index + 1:000}",
                 TimestampUtc: generatedAt.AddSeconds(-index),
                 LatitudeDegrees: baseLatitude + GetCoordinateJitter(),
                 LongitudeDegrees: baseLongitude + GetCoordinateJitter(),
