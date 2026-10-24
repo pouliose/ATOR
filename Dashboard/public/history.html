@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101923">
+    <meta name="description" content="Browse paginated telemetry history for a track.">
+    <title>ATOR | Track history</title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <script type="module" src="/assets/js/features/tracks/history-page.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand" aria-label="ATOR Operations">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span>ATOR Operations</span>
+      </div>
+      <nav class="topbar-nav" aria-label="Main navigation">
+        <a class="nav-link" href="/">Current tracks</a>
+        <a class="nav-link nav-link-active" href="/history.html" aria-current="page">Track history</a>
+      </nav>
+      <span class="environment-label">LIVE TELEMETRY</span>
+    </header>
+
+    <main class="dashboard">
+      <section class="page-heading" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">TELEMETRY ARCHIVE</p>
+          <h1 id="page-title">Telemetry history</h1>
+          <p class="page-description">Browse accepted reports, newest first, across all sources using this track ID.</p>
+        </div>
+      </section>
+
+      <section class="summary-grid history-stat-grid" aria-label="History summary">
+        <article class="summary-card history-stat-card">
+          <p class="summary-label">Reports loaded</p>
+          <p class="summary-value" id="reports-loaded">0</p>
+          <p class="summary-note">Across the pages viewed</p>
+        </article>
+        <article class="summary-card history-stat-card">
+          <p class="summary-label">Reporting sources</p>
+          <p class="summary-value" id="source-count">—</p>
+          <p class="summary-note">Represented in loaded reports</p>
+        </article>
+        <article class="summary-card history-stat-card">
+          <p class="summary-label">Newest report</p>
+          <p class="summary-value history-stat-date" id="newest-report">—</p>
+          <p class="summary-note">Timestamp of the latest report</p>
+        </article>
+      </section>
+
+      <section class="tracks-panel history-panel" aria-label="Track telemetry history">
+        <form class="history-search" id="history-form">
+          <label class="form-field" for="track-id">
+            Track ID
+            <input id="track-id" name="trackId" type="search" maxlength="200" placeholder="e.g. SIM-001" autocomplete="off" required>
+          </label>
+          <label class="form-field" for="page-limit">
+            Page size
+            <select id="page-limit" name="limit">
+              <option value="20">20 reports</option>
+              <option value="50">50 reports</option>
+              <option value="100" selected>100 reports</option>
+              <option value="250">250 reports</option>
+              <option value="500">500 reports</option>
+            </select>
+          </label>
+          <button class="refresh-button" id="search-button" type="submit">
+            <span aria-hidden="true">&#9906;</span>
+            Load history
+          </button>
+        </form>
+
+        <div class="error-message" id="history-error" role="alert" hidden></div>
+        <div class="history-summary">
+          <div>
+            <p class="history-summary-title">Track reports</p>
+            <span id="history-status" role="status" aria-live="polite">Enter a track ID to view its history.</span>
+          </div>
+          <span class="history-order-label"><span aria-hidden="true">&#8595;</span> Newest first</span>
+          <span id="history-page-info"></span>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Reported</th>
+                <th scope="col">Source</th>
+                <th scope="col">Track</th>
+                <th scope="col">Latitude</th>
+                <th scope="col">Longitude</th>
+                <th scope="col">Altitude</th>
+                <th scope="col">Ground speed</th>
+              </tr>
+            </thead>
+            <tbody id="history-body">
+              <tr>
+                <td class="table-placeholder" colspan="7">Search for a track to load its telemetry history.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="load-more-row" id="load-more-row" hidden>
+          <button class="refresh-button subtle-button" id="load-more-button" type="button">
+            Load older reports
+          </button>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <span>ATOR <span class="footer-divider">/</span> Simulated telemetry dashboard</span>
+        <span>&copy; 2026 ATOR</span>
+      </footer>
+    </main>
+  </body>
+</html>

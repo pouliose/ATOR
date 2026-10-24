@@ -11,10 +11,14 @@
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="/" aria-label="ATOR dashboard home">
+      <div class="brand" aria-label="ATOR Operations">
         <span class="brand-mark" aria-hidden="true">A</span>
-        <span>ATOR <span class="brand-divider">/</span> Operations</span>
-      </a>
+        <span>ATOR Operations</span>
+      </div>
+      <nav class="topbar-nav" aria-label="Main navigation">
+        <a class="nav-link nav-link-active" href="/" aria-current="page">Current tracks</a>
+        <a class="nav-link" href="/history.html">Track history</a>
+      </nav>
       <span class="environment-label">LIVE TELEMETRY</span>
     </header>
 
@@ -81,7 +85,10 @@
           </table>
         </div>
       </section>
-      <footer class="page-footer">ATOR telemetry dashboard</footer>
+      <footer class="page-footer">
+        <span>ATOR <span class="footer-divider">/</span> Simulated telemetry dashboard</span>
+        <span>&copy; 2026 ATOR</span>
+      </footer>
     </main>
   </body>
 </html>

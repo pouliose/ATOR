@@ -19,7 +19,15 @@ export function renderCurrentTracks(elements, report) {
 
   const rows = report.tracks.map((track) => {
     const row = document.createElement("tr");
-    appendCell(row, track.trackId, "track-name");
+    const trackCell = document.createElement("td");
+    trackCell.className = "track-name";
+    const historyLink = document.createElement("a");
+    historyLink.className = "track-history-link";
+    historyLink.href = `/history.html?trackId=${encodeURIComponent(track.trackId)}`;
+    historyLink.textContent = track.trackId;
+    historyLink.setAttribute("aria-label", `View history for track ${track.trackId}`);
+    trackCell.append(historyLink);
+    row.append(trackCell);
     appendCell(row, track.sourceId);
     appendCell(row, formatNumber(track.latitudeDegrees));
     appendCell(row, formatNumber(track.longitudeDegrees));
