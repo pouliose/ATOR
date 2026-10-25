@@ -57,3 +57,6 @@ every five seconds. The host port can be changed with
 Open `http://localhost:5173/history.html` to search by track ID, or select a
 track ID in the current positions table. History displays newest reports first;
 use **Load older reports** to request the next page.
+
+Recent persisted alerts are available from the Consumer API at
+`/api/v1/alerts?limit=100`. The dashboard does not yet render an alert view.

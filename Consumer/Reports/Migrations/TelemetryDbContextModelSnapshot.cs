@@ -94,6 +94,64 @@ namespace ATOR.Consumer.Reports.Migrations
 
                     b.ToTable("telemetry_reports", (string)null);
                 });
+
+            modelBuilder.Entity("ATOR.Reports.TrackAlertEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("DeduplicationKey")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("deduplication_key");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("details");
+
+                    b.Property<DateTime>("ObservedTimestampUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("observed_timestamp_utc");
+
+                    b.Property<DateTime>("OccurredAtUtc")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("occurred_at_utc");
+
+                    b.Property<string>("SourceId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("source_id");
+
+                    b.Property<string>("TrackId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("track_id");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("type");
+
+                    b.Property<string>("ZoneId")
+                        .HasColumnType("text")
+                        .HasColumnName("zone_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OccurredAtUtc", "Id")
+                        .HasDatabaseName("IX_track_alerts_occurred_at_utc_id");
+
+                    b.HasIndex("Type", "SourceId", "TrackId", "ObservedTimestampUtc", "DeduplicationKey")
+                        .IsUnique()
+                        .HasDatabaseName("IX_track_alerts_type_source_track_observed_timestamp");
+
+                    b.ToTable("track_alerts", (string)null);
+                });
 #pragma warning restore 612, 618
         }
     }

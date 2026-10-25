@@ -71,8 +71,9 @@ The logical JSON property names are camelCase. XML uses a `TrackReport` root ele
 - A report older than the latest accepted timestamp for its identity is stale and must not replace the current track.
 - Invalid or unsupported payloads are rejected with an explicit error/result and must not stop the receiver from processing later reports.
 - Restricted test zones are configurable geographic areas. An alert is raised when an accepted track enters a configured zone.
+- Start with no restricted zones configured. Users will manage zones through a dedicated REST API; until that API is implemented, zones can be configured in the consumer's `Alerting:Zones` application settings.
 - A track is considered silent after its configured stale timeout; the timeout must be configurable rather than embedded in alert logic.
-- Alert history records the alert type, track identity, occurrence time, and relevant zone or timeout details.
+- Alert history records the alert type, track identity, occurrence time, and relevant zone or timeout details. `ObservedTimestampUtc` identifies the telemetry report used to evaluate the alert. `OccurredAtUtc` identifies when the alert condition began; for transmission loss it is the last report timestamp plus the configured stale timeout, not when the periodic checker later detected it. For zone entry, both timestamps are the accepted report timestamp. Repeated checks do not create duplicate transmission-lost alerts for the same last report.
 
 ## Acceptance criteria
 
@@ -80,8 +81,8 @@ The logical JSON property names are camelCase. XML uses a `TrackReport` root ele
 2. JSON and XML examples above parse to equivalent domain values; missing fields, malformed payloads, invalid coordinates, and negative altitude or speed are rejected explicitly.
 3. Repeated reports and out-of-order timestamps do not duplicate history or roll back a current track.
 4. The hosted application remains active while listening for local UDP reports, shuts down cleanly, and continues after a rejected datagram.
-5. Configured zone-entry and transmission-timeout conditions produce queryable alerts.
-6. The REST API exposes current tracks, paginated track history, alert history, and service health; automated tests cover success and failure cases.
+5. Configured zone-entry and transmission-timeout conditions produce queryable, persisted alerts.
+6. The REST API exposes current tracks, paginated track history, recent alert history, and service health; automated tests cover success and failure cases.
 7. The dashboard shows current simulated positions and alerts and updates as new reports arrive.
 8. The project can be built and its automated tests run on Windows and Linux using documented steps.
 9. Performance testing records throughput, processing latency, and memory use for a repeatable simulated load; results include the test environment and load profile.

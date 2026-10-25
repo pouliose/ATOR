@@ -8,6 +8,10 @@ Accept: application/json
 GET {{baseUrl}}/api/v1/tracks/current
 Accept: application/json
 
+### Get the newest 100 alerts
+GET {{baseUrl}}/api/v1/alerts?limit=100
+Accept: application/json
+
 ### Get the newest telemetry history page for a track ID
 GET {{baseUrl}}/api/v1/tracks/DRONE-001/history?limit=100
 Accept: application/json

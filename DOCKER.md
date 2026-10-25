@@ -35,6 +35,8 @@ Compose passes settings to .NET using the double-underscore environment variable
 | `TELEMETRY_INTERVAL_SECONDS` | `1` | Number of seconds between producer batches. |
 | `TELEMETRY_TRACK_COUNT` | `3` | Simulated tracks in each producer batch. |
 | `TELEMETRY_SOURCE_ID` | `COLLECTOR-01` | Identifier attached to producer reports. |
+| `ALERTING_STALE_TIMEOUT_SECONDS` | `60` | Seconds without a newer report before a transmission-lost alert is recorded. |
+| `ALERTING_CHECK_INTERVAL_SECONDS` | `5` | How often the consumer checks for tracks that exceeded the stale timeout. |
 | `CONSUMER_HTTP_HOST_PORT` | `5100` | Host port for the Consumer HTTP API. Bound to `127.0.0.1` only. |
 | `DASHBOARD_HTTP_HOST_PORT` | `5173` | Host port for the Dashboard frontend. Bound to `127.0.0.1` only. |
 | `POSTGRES_HOST_PORT` | `5433` | Host port for local PostgreSQL clients and EF CLI tools. Bound to `127.0.0.1` only. |
@@ -47,6 +49,26 @@ $env:TELEMETRY_UDP_PORT = "5100"
 $env:TELEMETRY_SOURCE_ID = "COLLECTOR-02"
 docker compose up --build
 ```
+
+The consumer starts with no restricted zones configured, so it will not produce
+zone-entry alerts until zones are added. For now, configure them in
+`Consumer/appsettings.json` under `Alerting:Zones`, using inclusive rectangular
+test zones with minimum/maximum latitude and longitude. Zone IDs must be unique,
+coordinates must be in range, and minimum values must not exceed maximum values.
+A zone-management API is a planned follow-up; configuration through that API is
+not available yet. Each accepted report entering a zone creates one alert;
+staying inside does not repeat it. A new entry after leaving creates another
+alert.
+
+The consumer checks tracks on the configured interval and records one
+transmission-lost alert per last accepted report after the stale timeout. Alert
+history is persisted in PostgreSQL and available at
+`GET /api/v1/alerts?limit=100` (limits from 1 to 500).
+In each alert response, `ObservedTimestampUtc` is the timestamp of the last
+accepted telemetry report. `OccurredAtUtc` is when the alert condition began:
+for transmission loss, it is the observed timestamp plus the configured stale
+timeout, not the later time when the periodic checker detected it. For zone
+entry, both timestamps are the accepted report time that shows the entry.
 
 In a Linux shell:
 

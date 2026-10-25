@@ -9,6 +9,8 @@ public sealed class TelemetryDbContext(DbContextOptions<TelemetryDbContext> opti
 
     public DbSet<TelemetryReportEntity> TelemetryReports => Set<TelemetryReportEntity>();
 
+    public DbSet<TrackAlertEntity> Alerts => Set<TrackAlertEntity>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<CurrentTrackEntity>(entity =>
@@ -45,6 +47,33 @@ public sealed class TelemetryDbContext(DbContextOptions<TelemetryDbContext> opti
                 })
                 .HasDatabaseName("IX_telemetry_reports_track_id_timestamp_utc_source_id");
         });
+
+        modelBuilder.Entity<TrackAlertEntity>(entity =>
+        {
+            entity.ToTable("track_alerts");
+            entity.HasKey(alert => alert.Id);
+            entity.Property(alert => alert.Id).HasColumnName("id").UseIdentityByDefaultColumn();
+            entity.Property(alert => alert.Type).HasColumnName("type");
+            entity.Property(alert => alert.SourceId).HasColumnName("source_id");
+            entity.Property(alert => alert.TrackId).HasColumnName("track_id");
+            entity.Property(alert => alert.OccurredAtUtc).HasColumnName("occurred_at_utc");
+            entity.Property(alert => alert.ObservedTimestampUtc).HasColumnName("observed_timestamp_utc");
+            entity.Property(alert => alert.DeduplicationKey).HasColumnName("deduplication_key");
+            entity.Property(alert => alert.ZoneId).HasColumnName("zone_id");
+            entity.Property(alert => alert.Details).HasColumnName("details");
+            entity.HasIndex(alert => new
+                {
+                    alert.Type,
+                    alert.SourceId,
+                    alert.TrackId,
+                    alert.ObservedTimestampUtc,
+                    alert.DeduplicationKey
+                })
+                .IsUnique()
+                .HasDatabaseName("IX_track_alerts_type_source_track_observed_timestamp");
+            entity.HasIndex(alert => new { alert.OccurredAtUtc, alert.Id })
+                .HasDatabaseName("IX_track_alerts_occurred_at_utc_id");
+        });
     }
 }
 
@@ -80,4 +109,25 @@ public sealed class CurrentTrackEntity
     public double AltitudeMeters { get; set; }
 
     public double GroundSpeedMetersPerSecond { get; set; }
+}
+
+public sealed class TrackAlertEntity
+{
+    public long Id { get; set; }
+
+    public string Type { get; set; } = string.Empty;
+
+    public string SourceId { get; set; } = string.Empty;
+
+    public string TrackId { get; set; } = string.Empty;
+
+    public DateTime OccurredAtUtc { get; set; }
+
+    public DateTime ObservedTimestampUtc { get; set; }
+
+    public string DeduplicationKey { get; set; } = string.Empty;
+
+    public string? ZoneId { get; set; }
+
+    public string Details { get; set; } = string.Empty;
 }

@@ -23,6 +23,8 @@ services:
     environment:
       Telemetry__UdpPort: "${TELEMETRY_UDP_PORT:-5000}"
       Telemetry__ListenAddress: "0.0.0.0"
+      Alerting__StaleTimeoutSeconds: "${ALERTING_STALE_TIMEOUT_SECONDS:-60}"
+      Alerting__CheckIntervalSeconds: "${ALERTING_CHECK_INTERVAL_SECONDS:-5}"
       ConnectionStrings__Telemetry: "Host=postgres;Port=5432;Database=ator;Username=ator;Password=${POSTGRES_PASSWORD:-ator_dev_password}"
     depends_on:
       postgres:
@@ -54,7 +56,7 @@ services:
       Telemetry__ReceiverHost: "consumer"
       Telemetry__IntervalSeconds: "${TELEMETRY_INTERVAL_SECONDS:-1}"
       Telemetry__TrackCount: "${TELEMETRY_TRACK_COUNT:-3}"
-      Telemetry__SourceId: "${TELEMETRY_SOURCE_ID:-SIM-01}"
+      Telemetry__SourceId: "${TELEMETRY_SOURCE_ID:-COLLECTOR-01}"
     restart: unless-stopped
 
 volumes:
