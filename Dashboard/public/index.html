@@ -7,20 +7,11 @@
     <meta name="description" content="Live overview of the latest reported track positions.">
     <title>ATOR | Track dashboard</title>
     <link rel="stylesheet" href="/assets/css/styles.css">
+    <script type="module" src="/assets/js/shared/site-header.js"></script>
     <script type="module" src="/assets/js/app.js"></script>
   </head>
   <body>
-    <header class="topbar">
-      <div class="brand" aria-label="ATOR Operations">
-        <span class="brand-mark" aria-hidden="true">A</span>
-        <span>ATOR Operations</span>
-      </div>
-      <nav class="topbar-nav" aria-label="Main navigation">
-        <a class="nav-link nav-link-active" href="/" aria-current="page">Current tracks</a>
-        <a class="nav-link" href="/history.html">Track history</a>
-      </nav>
-      <span class="environment-label">LIVE TELEMETRY</span>
-    </header>
+    <ator-site-header current-page="tracks"></ator-site-header>
 
     <main class="dashboard">
       <section class="page-heading" aria-labelledby="page-title">

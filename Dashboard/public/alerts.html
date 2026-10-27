@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101923">
+    <meta name="description" content="Review recent alerts for simulated tracks.">
+    <title>ATOR | Alert history</title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <script type="module" src="/assets/js/shared/site-header.js"></script>
+    <script type="module" src="/assets/js/features/alerts/alerts-page.js"></script>
+  </head>
+  <body>
+    <ator-site-header current-page="alerts"></ator-site-header>
+
+    <main class="dashboard">
+      <section class="page-heading" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">EVENT MONITORING</p>
+          <h1 id="page-title">Alert history</h1>
+          <p class="page-description">Recent zone-entry and transmission-lost alerts for simulated tracks.</p>
+        </div>
+        <button class="refresh-button" id="refresh-button" type="button">
+          <span aria-hidden="true">&#8635;</span>
+          Refresh
+        </button>
+      </section>
+
+      <section class="summary-grid history-stat-grid" aria-label="Alert summary">
+        <article class="summary-card history-stat-card">
+          <p class="summary-label">Alerts loaded</p>
+          <p class="summary-value" id="alert-count">0</p>
+          <p class="summary-note">Recent alerts in this view</p>
+        </article>
+        <article class="summary-card history-stat-card">
+          <p class="summary-label">Zone entries</p>
+          <p class="summary-value" id="zone-entry-count">0</p>
+          <p class="summary-note">Entry into a configured zone</p>
+        </article>
+        <article class="summary-card history-stat-card">
+          <p class="summary-label">Transmission lost</p>
+          <p class="summary-value" id="transmission-lost-count">0</p>
+          <p class="summary-note">Tracks past their stale timeout</p>
+        </article>
+      </section>
+
+      <section class="tracks-panel" aria-labelledby="alerts-title">
+        <div class="panel-heading">
+          <div>
+            <h2 id="alerts-title">Recent alerts</h2>
+            <p id="refresh-status" role="status" aria-live="polite">Loading alert history…</p>
+          </div>
+          <label class="form-field alert-limit-field" for="alert-limit">
+            Page size
+            <select id="alert-limit" name="limit">
+              <option value="20">20 alerts</option>
+              <option value="50">50 alerts</option>
+              <option value="100" selected>100 alerts</option>
+              <option value="250">250 alerts</option>
+              <option value="500">500 alerts</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="error-message" id="alerts-error" role="alert" hidden></div>
+
+        <div class="table-scroll">
+          <table class="alerts-table">
+            <thead>
+              <tr>
+                <th scope="col">Type</th>
+                <th scope="col">Occurred</th>
+                <th scope="col">Track</th>
+                <th scope="col">Source</th>
+                <th scope="col">Observed report</th>
+                <th scope="col">Details</th>
+              </tr>
+            </thead>
+            <tbody id="alerts-body">
+              <tr>
+                <td class="table-placeholder" colspan="6">Loading recent alerts…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer class="page-footer">
+        <span>ATOR <span class="footer-divider">/</span> Simulated telemetry dashboard</span>
+        <span>&copy; 2026 ATOR</span>
+      </footer>
+    </main>
+  </body>
+</html>

@@ -7,20 +7,11 @@
     <meta name="description" content="Browse paginated telemetry history for a track.">
     <title>ATOR | Track history</title>
     <link rel="stylesheet" href="/assets/css/styles.css">
+    <script type="module" src="/assets/js/shared/site-header.js"></script>
     <script type="module" src="/assets/js/features/tracks/history-page.js"></script>
   </head>
   <body>
-    <header class="topbar">
-      <div class="brand" aria-label="ATOR Operations">
-        <span class="brand-mark" aria-hidden="true">A</span>
-        <span>ATOR Operations</span>
-      </div>
-      <nav class="topbar-nav" aria-label="Main navigation">
-        <a class="nav-link" href="/">Current tracks</a>
-        <a class="nav-link nav-link-active" href="/history.html" aria-current="page">Track history</a>
-      </nav>
-      <span class="environment-label">LIVE TELEMETRY</span>
-    </header>
+    <ator-site-header current-page="history"></ator-site-header>
 
     <main class="dashboard">
       <section class="page-heading" aria-labelledby="page-title">

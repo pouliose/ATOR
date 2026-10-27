@@ -39,6 +39,10 @@ body {
   background: rgb(16 25 35 / 88%);
 }
 
+ator-site-header {
+  display: block;
+}
+
 .brand {
   display: inline-flex;
   align-items: center;
@@ -94,7 +98,6 @@ body {
   outline-offset: 3px;
 }
 
-.environment-label,
 .eyebrow,
 .summary-label,
 .refresh-interval {
@@ -102,10 +105,6 @@ body {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
-}
-
-.environment-label {
-  color: var(--accent);
 }
 
 .dashboard {
@@ -368,6 +367,47 @@ tbody tr:hover {
   font-size: clamp(18px, 2vw, 24px);
 }
 
+.alert-limit-field {
+  min-width: 130px;
+}
+
+.alerts-table td.alert-details {
+  min-width: 240px;
+  max-width: 420px;
+  white-space: normal;
+  line-height: 1.5;
+}
+
+.alert-type-badge {
+  display: inline-flex;
+  min-height: 25px;
+  align-items: center;
+  padding: 4px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.alert-type-zone {
+  border-color: rgb(226 183 104 / 30%);
+  background: rgb(226 183 104 / 10%);
+  color: #f0cb83;
+}
+
+.alert-type-transmission {
+  border-color: rgb(255 142 142 / 30%);
+  background: rgb(255 142 142 / 10%);
+  color: #ffabab;
+}
+
+.alert-type-unknown {
+  border-color: var(--border);
+  background: var(--surface-raised);
+  color: var(--muted);
+}
+
 .form-field {
   display: grid;
   gap: 7px;
@@ -566,6 +606,10 @@ tbody tr:hover {
 
   .history-search {
     grid-template-columns: 1fr 110px;
+  }
+
+  .alert-limit-field {
+    width: 100%;
   }
 
   .history-search .refresh-button {
