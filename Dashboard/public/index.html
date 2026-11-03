@@ -17,8 +17,8 @@
       <section class="page-heading" aria-labelledby="page-title">
         <div>
           <p class="eyebrow">SITUATIONAL OVERVIEW</p>
-          <h1 id="page-title">Track positions</h1>
-          <p class="page-description">Latest position received for each reporting track.</p>
+          <h1 id="page-title">Live track map</h1>
+          <p class="page-description">Live positions for simulated aircraft and drone tracks.</p>
         </div>
         <button class="refresh-button" id="refresh-button" type="button">
           <span aria-hidden="true">&#8635;</span>
@@ -44,10 +44,54 @@
         </article>
       </section>
 
+      <section class="tracks-panel map-panel" aria-labelledby="map-heading">
+        <div class="panel-heading map-panel-heading">
+          <div>
+            <h2 id="map-heading">Live map · Athens</h2>
+            <p>Live drone positions on an OpenStreetMap basemap. Select a drone to view its history.</p>
+          </div>
+          <span class="refresh-interval">LIVE · 5 SEC</span>
+        </div>
+        <div class="map-frame">
+          <svg
+            class="live-map"
+            id="live-map"
+            role="img"
+            aria-labelledby="map-title map-description"
+            viewBox="0 0 1000 500"
+            preserveAspectRatio="xMidYMid meet">
+            <title id="map-title">Live map of current tracks near Athens</title>
+            <desc id="map-description">OpenStreetMap street map centered on Athens with a marker for each current track. Use the plus and minus controls to zoom, or select a marker to view its telemetry history.</desc>
+            <defs>
+              <clipPath id="map-tile-clip">
+                <rect x="0" y="0" width="1000" height="500"></rect>
+              </clipPath>
+            </defs>
+            <g id="map-tiles" clip-path="url(#map-tile-clip)" aria-hidden="true"></g>
+            <g id="map-overlays" aria-hidden="true">
+              <g class="map-compass">
+                <path d="M932 68L941 43L950 68L941 63Z"></path>
+                <text x="941" y="35" text-anchor="middle">N</text>
+              </g>
+              <g id="map-scale" class="map-scale"></g>
+            </g>
+            <g id="map-tracks"></g>
+          </svg>
+          <div class="map-controls" aria-label="Map controls">
+            <button id="map-zoom-in" type="button" aria-label="Zoom in" title="Zoom in">+</button>
+            <button id="map-zoom-out" type="button" aria-label="Zoom out" title="Zoom out">−</button>
+          </div>
+        </div>
+        <div class="map-caption">
+          <span id="map-status" role="status" aria-live="polite">Waiting for telemetry positions</span>
+          <span>© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a></span>
+        </div>
+      </section>
+
       <section class="tracks-panel" aria-labelledby="tracks-title">
         <div class="panel-heading">
           <div>
-            <h2 id="tracks-title">Current positions</h2>
+            <h2 id="tracks-title">Track details</h2>
             <p>Position and motion details for all known tracks.</p>
           </div>
           <span class="refresh-interval">Auto-refresh · 5 sec</span>

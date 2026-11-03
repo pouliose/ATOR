@@ -1,3 +1,5 @@
+import { renderLiveMap } from "./live-map-view.js";
+
 const numberFormat = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 4,
 });
@@ -10,6 +12,7 @@ const dateFormat = new Intl.DateTimeFormat(undefined, {
 export function renderCurrentTracks(elements, report) {
   elements.trackCount.textContent = String(report.trackCount);
   elements.updatedAt.textContent = `Last response: ${formatDate(report.generatedAtUtc)}`;
+  renderLiveMap(elements.liveMap, elements.mapStatus, report.tracks);
   elements.tracksBody.replaceChildren();
 
   if (report.tracks.length === 0) {

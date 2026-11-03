@@ -1,4 +1,5 @@
 import { getCurrentTracks } from "./features/tracks/current-tracks-api.js";
+import { initializeLiveMap } from "./features/tracks/live-map-view.js";
 import {
   clearError,
   renderCurrentTracks,
@@ -9,6 +10,8 @@ import {
 const REFRESH_INTERVAL_MS = 5_000;
 const elements = {
   errorMessage: document.querySelector("#error-message"),
+  liveMap: document.querySelector("#live-map"),
+  mapStatus: document.querySelector("#map-status"),
   refreshButton: document.querySelector("#refresh-button"),
   statusIndicator: document.querySelector("#status-indicator"),
   statusText: document.querySelector("#status-text"),
@@ -20,6 +23,8 @@ const elements = {
 let refreshTimer;
 let requestInProgress = false;
 let hasLoadedData = false;
+
+initializeLiveMap(elements.liveMap, elements.mapStatus);
 
 async function refreshCurrentTracks() {
   if (requestInProgress) {

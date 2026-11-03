@@ -24,6 +24,7 @@ Dashboard/
           tracks/
             current-tracks-api.js
             current-tracks-view.js
+            live-map-view.js
             history-api.js
             history-page.js
             history-view.js
@@ -37,7 +38,15 @@ Dashboard/
 - `features` pages use the shared `ator-site-header` component for consistent
   navigation and active-page indication.
 - `features/tracks/current-tracks-api.js` owns HTTP access and response checks.
-- `features/tracks/current-tracks-view.js` renders track data using DOM APIs.
+- `features/tracks/current-tracks-view.js` renders track data using DOM APIs;
+  `live-map-view.js` plots current positions over OpenStreetMap tiles centered
+  on Athens. The map loads only the tiles needed for the current view from the
+  OpenStreetMap tile service; internet access is required. Map attribution is
+  displayed below the map, and zoom controls load tiles on demand. The browser
+  handles tile caching; the dashboard does not prefetch or store tiles offline.
+  The public tile service is community-funded and best-effort; deployments with
+  significant traffic should use a dedicated map-tile provider and follow its
+  usage terms. See the [OpenStreetMap tile usage policy](https://operations.osmfoundation.org/policies/tiles/).
 - `history.html` provides track history search and cursor-based pagination;
   select a track ID from the current positions table to open its history.
 - `features/tracks/history-api.js` requests and validates history pages.
@@ -62,13 +71,15 @@ From the `ATOR` directory:
 docker compose up --build
 ```
 
-Open `http://localhost:5173`. The dashboard refreshes current track positions
-every five seconds. The host port can be changed with
+Open `http://localhost:5173`. The dashboard plots current track positions on
+OpenStreetMap around Athens and refreshes track positions every five seconds.
+The map uses online map tiles and needs internet access. Select a map marker or
+track ID to open that track's history. The host port can be changed with
 `DASHBOARD_HTTP_HOST_PORT`.
 
 Open `http://localhost:5173/history.html` to search by track ID, or select a
-track ID in the current positions table. History displays newest reports first;
-use **Load older reports** to request the next page.
+track ID in the map or track details table. History displays newest reports
+first; use **Load older reports** to request the next page.
 
 Open `http://localhost:5173/alerts.html` to review recent alerts. The page
 explains that `Occurred` is when the alert condition began (for transmission

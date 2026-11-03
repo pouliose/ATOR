@@ -253,6 +253,10 @@ h1 {
   overflow: hidden;
 }
 
+.map-panel {
+  margin-bottom: 22px;
+}
+
 .panel-heading {
   min-height: 90px;
   padding: 20px 22px;
@@ -265,6 +269,197 @@ h1 {
 
 .panel-heading p {
   font-size: 13px;
+}
+
+.map-panel-heading {
+  min-height: 78px;
+}
+
+.map-frame {
+  position: relative;
+  margin: 0 18px;
+  overflow: hidden;
+  border: 1px solid #293f4c;
+  border-radius: 9px;
+  background: #e8e5dc;
+}
+
+.live-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 1;
+}
+
+.map-compass path {
+  fill: #27343b;
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.map-compass text,
+.map-scale-label {
+  fill: #27343b;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-linejoin: round;
+  stroke-width: 3px;
+}
+
+.map-scale-line {
+  fill: none;
+  stroke: #27343b;
+  stroke-width: 2.5;
+  paint-order: stroke;
+  stroke-linecap: square;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 2px #fff);
+}
+
+.map-controls {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid #aeb4b6;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 5px rgb(26 39 47 / 25%);
+}
+
+.map-controls button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: #fff;
+  color: #27343b;
+  cursor: pointer;
+  font: 600 23px/1 "Segoe UI", Arial, sans-serif;
+}
+
+.map-controls button + button {
+  border-top: 1px solid #d6d9d8;
+}
+
+.map-controls button:hover:not(:disabled) {
+  background: #edf2f2;
+}
+
+.map-controls button:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid #367b83;
+  outline-offset: -3px;
+}
+
+.map-controls button:disabled {
+  color: #a4abad;
+  cursor: not-allowed;
+}
+
+.map-marker-link {
+  cursor: pointer;
+  outline: none;
+}
+
+.map-drone {
+  --drone-color: var(--accent);
+}
+
+.map-drone-mint {
+  --drone-color: #74d4bb;
+}
+
+.map-drone-blue {
+  --drone-color: #72b8f5;
+}
+
+.map-drone-amber {
+  --drone-color: #efc36c;
+}
+
+.map-drone-violet {
+  --drone-color: #ba9af7;
+}
+
+.map-drone-coral {
+  --drone-color: #f28f86;
+}
+
+.map-drone-cyan {
+  --drone-color: #6fd8e0;
+}
+
+.map-drone-halo {
+  fill: var(--drone-color);
+  opacity: 0.13;
+  transition: r 120ms ease, opacity 120ms ease;
+}
+
+.map-drone-arm {
+  stroke: var(--drone-color);
+  stroke-linecap: round;
+  stroke-width: 2.5;
+}
+
+.map-drone-rotor {
+  fill: #101b25;
+  stroke: var(--drone-color);
+  stroke-width: 2;
+}
+
+.map-drone-body {
+  fill: var(--drone-color);
+  stroke: #101b25;
+  stroke-width: 1;
+}
+
+.map-marker-label {
+  fill: #e8eff5;
+  font-size: 13px;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: #101b25;
+  stroke-linejoin: round;
+  stroke-width: 4px;
+}
+
+.map-marker-link:hover .map-drone-halo,
+.map-marker-link:focus-visible .map-drone-halo {
+  opacity: 0.28;
+  r: 19px;
+}
+
+.map-marker-link:focus-visible .map-marker-label {
+  fill: var(--accent);
+}
+
+.map-empty-label {
+  fill: var(--muted);
+  font-size: 16px;
+}
+
+.map-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 22px 15px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.map-caption a {
+  color: var(--muted);
+  text-underline-offset: 2px;
+}
+
+.map-caption a:hover {
+  color: var(--accent);
 }
 
 .refresh-interval {
@@ -598,6 +793,16 @@ tbody tr:hover {
     align-items: flex-start;
     flex-direction: column;
     gap: 12px;
+  }
+
+  .map-frame {
+    margin: 0 10px;
+  }
+
+  .map-caption {
+    flex-direction: column;
+    gap: 5px;
+    padding: 12px 14px 14px;
   }
 
   .environment-label {
